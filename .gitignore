@@ -1,0 +1,13 @@
+node_modules
+.vscode
+artifacts
+*~
+\#*
+.idea
+.map
+*.json
+!package.json
+!package-lock.json
+process-data.js
+*.key
+.env

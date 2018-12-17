@@ -1,0 +1,26 @@
+{
+  "name": "dialogflow-train",
+  "version": "1.0.0",
+  "description": "Utilities for training your dialogflow bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/junron/dialogflow-train.git"
+  },
+  "keywords": [
+    "dialogflow",
+    "node"
+  ],
+  "author": "junron",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/junron/dialogflow-train/issues"
+  },
+  "homepage": "https://github.com/junron/dialogflow-train#readme",
+  "dependencies": {
+    "dialogflow": "^0.7.0"
+  }
+}
