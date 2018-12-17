@@ -1,27 +1,9 @@
-let config
-const {join} = require("path")
-const {readFileSync} = require("fs")
-try{
-  config = require(join(process.cwd(),"config.json"))
-}catch(e){
-  throw "Config file not found"
-}
+const config = require("./lib/loadData")
 
-if(config.DIALOGFLOW_PRIVATE_KEY_FILE){
-  config.DIALOGFLOW_PRIVATE_KEY = readFileSync(config.DIALOGFLOW_PRIVATE_KEY_FILE,'utf-8')
-}
+const dialogflow = require("./lib/dialogflow")(...config)
+const training = require("./lib/training")(...config)
 
-const dialogflow = require("./lib/dialogflow")(
-  config.PROJECT_ID,
-  config.DIALOGFLOW_PRIVATE_KEY,
-  config.DIALOGFLOW_CLIENT_EMAIL
-)
-const training = require("./lib/training")(
-  config.PROJECT_ID,
-  config.DIALOGFLOW_PRIVATE_KEY,
-  config.DIALOGFLOW_CLIENT_EMAIL
-)
-console.log("Successfully connected to dialogflow")
+console.log("\x1b[32mSuccessfully connected to dialogflow\x1b[0m")
 const uuid = require("uuid/v4")()
 
 if(process.argv[2]==="client"){
@@ -35,8 +17,15 @@ if(process.argv[2]==="client"){
       query:data
     })
     .then(response=>{
-      console.log("Bot:",response[0].queryResult.fulfillmentText)
+      console.log("\x1b[34mBot:",response[0].queryResult.fulfillmentText+"\x1b[0m")
       reader.prompt()
     })
+  })
+}else if(process.argv[2]==="dump"){
+  require("./lib/dump")(training)
+  .then(({responses,trainingPhrases})=>{
+    const {writeFileSync:writeFile} = require("fs")
+    writeFile("responses.json",JSON.stringify(responses))
+    writeFile("phrases.json",JSON.stringify(trainingPhrases))
   })
 }

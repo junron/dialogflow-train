@@ -4,7 +4,8 @@
   "description": "Utilities for training your dialogflow bot",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dialogflow-cli": "node cli.js"
   },
   "repository": {
     "type": "git",
@@ -16,6 +17,9 @@
   ],
   "author": "junron",
   "license": "MIT",
+  "bin": {
+    "dialogflow-cli": "./cli.js"
+  },
   "bugs": {
     "url": "https://github.com/junron/dialogflow-train/issues"
   },
