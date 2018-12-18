@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/junron/dialogflow-train#readme",
   "dependencies": {
+    "commander": "^2.19.0",
     "dialogflow": "^0.7.0",
     "uuid": "^3.3.2"
   }

@@ -11,3 +11,4 @@ artifacts
 process-data.js
 *.key
 .env
+*.csv
