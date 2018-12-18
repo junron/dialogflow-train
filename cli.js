@@ -6,6 +6,7 @@ const dialogflow = require("./lib/dialogflow")(...config)
 const training = require("./lib/training")(...config)
 
 const uuid = require("uuid/v4")()
+const utils = require("./lib/util")
 
 cli
 .version("1.0.0")
@@ -47,14 +48,14 @@ cli
       if(!options.phrasesOnly){
         // User did not ask to omit responses
         if(options.csv){
-          writeFile("responses.csv",toCSV(responses))
+          writeFile("responses.csv",utils.toCSV(responses))
         }else{
           writeFile("responses.json",JSON.stringify(responses))
         }
       }
       if(!options.responseOnly){
         if(options.csv){
-          writeFile("phrases.csv",toCSV(trainingPhrases))
+          writeFile("phrases.csv",utils.toCSV(trainingPhrases))
         }else{
           writeFile("phrases.json",JSON.stringify(trainingPhrases))
         }
@@ -63,27 +64,16 @@ cli
     })
 })
 
-function toCSV(data){
-  const mostRows = countData(data)
-  // Add one row for intent name
-  let csv = Array(mostRows+1).fill("")
-  for(const key in data){
-    csv[0]+=`"${key}",`
-    for(let i=1;i<=mostRows;i++){
-      if(data[key][i-1]===undefined){
-        csv[i]+=","
-      }else{
-        csv[i]+=`"${data[key][i-1]}",`
-      }
-    }
-  }
-  return csv.join("\n")
-}
-function countData(data){
-  let curr = 0
-  for(const key in data){
-    curr = Math.max(curr,data[key].length)
-  }
-  return curr
-}
+// Non existent command
+cli.on('command:*', function () {
+  console.error('Invalid command: %s\nSee --help for a list of available commands.', cli.args.join(' '));
+  process.exit(1)
+})
+
 cli.parse(process.argv)
+
+// No command specified, show help
+if(!cli.args.length){
+  cli.outputHelp()
+  process.exit(0)
+}
