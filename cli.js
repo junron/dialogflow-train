@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const config = require("./lib/loadData")
 const cli = require("commander")
 
