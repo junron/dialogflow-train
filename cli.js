@@ -8,12 +8,15 @@ const training = require("./lib/training")(...config)
 const uuid = require("uuid/v4")()
 const utils = require("./lib/util")
 
+
+console.log("\x1b[32mSuccessfully connected to dialogflow\x1b[0m")
+console.log("Request id:",uuid)
+
 cli
 .version("1.0.0")
 .command("client")
 .description("Talk to your bot from the command line")
 .action(()=>{
-  console.log("\x1b[32mSuccessfully connected to dialogflow\x1b[0m")
   const readline = require('readline')
   const reader = readline.createInterface(process.stdin, process.stdout, null)
   console.log("Type something to send to the bot.\nPress ^C to exit.")
@@ -40,7 +43,6 @@ cli
 .option("-r, --response-only","Only fetch responses")
 .option("-p, --phrases-only","Only fetch training phrases")
 .action((options)=>{
-  console.log("\x1b[32mSuccessfully connected to dialogflow\x1b[0m")
   const {writeFileSync:writeFile} = require("fs")
   require("./lib/dump")(training)
     .then(({responses,trainingPhrases})=>{
@@ -63,6 +65,22 @@ cli
       console.log("\x1b[32mDone.\x1b[0m")
     })
 })
+
+
+// Lists intents which have the least training phrases
+
+cli
+.command("needsreview")
+.description("Lists intents which have the least training phrases")
+.option("-j, --json","Output intents as JSON")
+.option("--no-color","Do not color output")
+.action(options=>{
+  training.needsReview(options.color,options.json)
+  .then(data=>{
+    console.log(data)
+  })
+})
+
 
 // Non existent command
 cli.on('command:*', function () {
