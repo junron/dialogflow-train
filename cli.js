@@ -19,15 +19,26 @@ cli
 .action(()=>{
   const readline = require('readline')
   const reader = readline.createInterface(process.stdin, process.stdout, null)
+  const [handleCommand,admin] = require("./lib/admin-commands")([uuid])
   console.log("Type something to send to the bot.\nPress ^C to exit.")
   reader.prompt()
-  reader.on("line",data=>{
+  reader.on("line",async data=>{
+    if(await handleCommand({chatId:uuid,text:data},{
+      sendMessage:(chatId,response)=>{
+        console.log("\x1b[36mCommand result:\n\n"+response+"\x1b[0m")
+      }
+    })){
+      reader.prompt()
+      return
+    }
     dialogflow({
       sessionId:uuid,
       query:data
     })
     .then(response=>{
-      console.log("\x1b[34mBot:",response[0].queryResult.fulfillmentText+"\x1b[0m")
+      const result = response[0].queryResult.fulfillmentText
+      console.log("\x1b[34mBot:",result+"\x1b[0m")
+      admin.setUserMessage(uuid,response[0].queryResult)
       reader.prompt()
     })
   })
