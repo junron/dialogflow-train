@@ -13,7 +13,7 @@ console.log("\x1b[32mSuccessfully connected to dialogflow\x1b[0m")
 console.log("Request id:",uuid)
 
 cli
-.version("1.0.0")
+.version(require("./package.json").version)
 .command("client")
 .description("Talk to your bot from the command line")
 .action(()=>{
@@ -50,7 +50,7 @@ cli
 cli
 .command("dump")
 .description("Dump responses and training phrases from dialogflow")
-.option("-c, --csv","Output data into a csv file")
+.option("-c, --csv","Also output data into a csv file")
 .option("-r, --response-only","Only fetch responses")
 .option("-p, --phrases-only","Only fetch training phrases")
 .action((options)=>{
@@ -58,20 +58,19 @@ cli
   require("./lib/dump")(training)
     .then(({responses,trainingPhrases})=>{
       console.log("\x1b[32mData fetched\x1b[0m")
+      console.log(options.json)
       if(!options.phrasesOnly){
         // User did not ask to omit responses
         if(options.csv){
           writeFile("responses.csv",utils.toCSV(responses))
-        }else{
-          writeFile("responses.json",JSON.stringify(responses))
         }
+        writeFile("responses.json",JSON.stringify(responses))
       }
       if(!options.responseOnly){
         if(options.csv){
           writeFile("phrases.csv",utils.toCSV(trainingPhrases))
-        }else{
-          writeFile("phrases.json",JSON.stringify(trainingPhrases))
         }
+        writeFile("phrases.json",JSON.stringify(trainingPhrases))
       }
       console.log("\x1b[32mDone.\x1b[0m")
     })
@@ -92,6 +91,22 @@ cli
   })
 })
 
+// Upload intents from a file
+cli
+.command("upload")
+.description("Upload intent data from a file")
+.option("--response-file <response file>","File that contains responses")
+.action(async options=>{
+  const {readFileSync} = require("fs")
+  let responses = readFileSync(options.responseFile,'utf-8')
+  if(options.responseFile.endsWith(".csv")){
+    responses = await utils.toJSON(responses)
+  }else{
+    responses = JSON.parse(responses)
+  }
+  const upload = require("./lib/upload")(training)
+  upload.uploadResponses(responses)
+})
 
 // Non existent command
 cli.on('command:*', function () {
