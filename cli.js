@@ -58,7 +58,6 @@ cli
   require("./lib/dump")(training)
     .then(({responses,trainingPhrases})=>{
       console.log("\x1b[32mData fetched\x1b[0m")
-      console.log(options.json)
       if(!options.phrasesOnly){
         // User did not ask to omit responses
         if(options.csv){
