@@ -53,27 +53,7 @@ cli
 .option("-c, --csv","Also output data into a csv file")
 .option("-r, --response-only","Only fetch responses")
 .option("-p, --phrases-only","Only fetch training phrases")
-.action((options)=>{
-  const {writeFileSync:writeFile} = require("fs")
-  require("./lib/dump")(training)
-    .then(({responses,trainingPhrases})=>{
-      console.log("\x1b[32mData fetched\x1b[0m")
-      if(!options.phrasesOnly){
-        // User did not ask to omit responses
-        if(options.csv){
-          writeFile("responses.csv",utils.toCSV(responses))
-        }
-        writeFile("responses.json",JSON.stringify(responses))
-      }
-      if(!options.responseOnly){
-        if(options.csv){
-          writeFile("phrases.csv",utils.toCSV(trainingPhrases))
-        }
-        writeFile("phrases.json",JSON.stringify(trainingPhrases))
-      }
-      console.log("\x1b[32mDone.\x1b[0m")
-    })
-})
+.action(download)
 
 
 // Lists intents which have the least training phrases
@@ -96,9 +76,33 @@ cli
 .description("Upload intent data from a file")
 .option("--response-file <response file>","File that contains responses")
 .option("--phrases-file <phrases file>","File that contains training phrases")
-.action(async options=>{
+.action(upload)
+
+async function download(options){
+  const {writeFileSync:writeFile} = require("fs")
+  require("./lib/dump")(training)
+    .then(({responses,trainingPhrases})=>{
+      console.log("\x1b[32mData fetched\x1b[0m")
+      if(!options.phrasesOnly){
+        // User did not ask to omit responses
+        if(options.csv){
+          writeFile("responses.csv",utils.toCSV(responses))
+        }
+        writeFile("responses.json",JSON.stringify(responses,null,2))
+      }
+      if(!options.responseOnly){
+        if(options.csv){
+          writeFile("phrases.csv",utils.toCSV(trainingPhrases))
+        }
+        writeFile("phrases.json",JSON.stringify(trainingPhrases,null,2))
+      }
+      console.log("\x1b[32mDone.\x1b[0m")
+    })
+}
+
+async function upload(options,errorOnNothingDone=true){
   let didSomething = false
-  const {readFileSync} = require("fs")
+  const {readFileSync,writeFileSync} = require("fs")
   const upload = require("./lib/upload")(training)
   if(options.responseFile){
     let responses = readFileSync(options.responseFile,'utf-8')
@@ -120,11 +124,38 @@ cli
     await upload.uploadPhrases(phrases)
     didSomething=true
   }
-  if(!didSomething){
+  if(!didSomething && errorOnNothingDone){
     throw new Error("Please specify at least one of --response-file and --phrases-file")
   }
+}
+cli
+.command("sync")
+.description("Upload intent data from a file, then downloads updated data from dialogflow")
+.action(async ()=>{
+  await upload({
+    responseFile:"./responses.csv",
+    phrasesFile:"./phrases.csv",
+  })
+  await download({csv:true})
 })
 
+cli
+.command("sync:watch")
+.description("Watches csv files for changes, then uploads nw data when files change")
+.action(async ()=>{
+  const watch = require('node-watch')
+  console.log("Watching for changes to phrases.csv and responses.csv...")
+  watch("./responses.csv",()=>{
+    upload({
+      responseFile:"./responses.csv",
+    })
+  })
+  watch("./phrases.csv",()=>{
+    upload({
+      phrasesFile:"./phrases.csv",
+    })
+  })
+})
 // Non existent command
 cli.on('command:*', function () {
   console.error('Invalid command: %s\nSee --help for a list of available commands.', cli.args.join(' '));
