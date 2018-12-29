@@ -96,16 +96,34 @@ cli
 .command("upload")
 .description("Upload intent data from a file")
 .option("--response-file <response file>","File that contains responses")
+.option("--phrases-file <phrases file>","File that contains training phrases")
 .action(async options=>{
+  let didSomething = false
   const {readFileSync} = require("fs")
-  let responses = readFileSync(options.responseFile,'utf-8')
-  if(options.responseFile.endsWith(".csv")){
-    responses = await utils.toJSON(responses)
-  }else{
-    responses = JSON.parse(responses)
-  }
   const upload = require("./lib/upload")(training)
-  upload.uploadResponses(responses)
+  if(options.responseFile){
+    let responses = readFileSync(options.responseFile,'utf-8')
+    if(options.responseFile.endsWith(".csv")){
+      responses = await utils.toJSON(responses)
+    }else{
+      responses = JSON.parse(responses)
+    }
+    await upload.uploadResponses(responses)
+    didSomething=true
+  }
+  if(options.phrasesFile){
+    let phrases = readFileSync(options.phrasesFile,'utf-8')
+    if(options.phrasesFile.endsWith(".csv")){
+      phrases = await utils.toJSON(phrases)
+    }else{
+      phrases = JSON.parse(phrases)
+    }
+    await upload.uploadPhrases(phrases)
+    didSomething=true
+  }
+  if(!didSomething){
+    throw new Error("Please specify at least one of --response-file and --phrases-file")
+  }
 })
 
 // Non existent command
