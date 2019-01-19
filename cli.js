@@ -80,7 +80,7 @@ cli
 
 async function download(options){
   const {writeFileSync:writeFile} = require("fs")
-  require("./lib/dump")(training)
+  require("./lib/dump").dump(training)
     .then(({responses,trainingPhrases})=>{
       console.log("\x1b[32mData fetched\x1b[0m")
       if(!options.phrasesOnly){
@@ -102,7 +102,7 @@ async function download(options){
 
 async function upload(options,errorOnNothingDone=true){
   let didSomething = false
-  const {readFileSync,writeFileSync} = require("fs")
+  const {readFileSync} = require("fs")
   const upload = require("./lib/upload")(training)
   if(options.responseFile){
     let responses = readFileSync(options.responseFile,'utf-8')
@@ -111,7 +111,7 @@ async function upload(options,errorOnNothingDone=true){
     }else{
       responses = JSON.parse(responses)
     }
-    await upload.uploadResponses(responses)
+    const output = await upload.uploadResponses(responses)
     didSomething=true
   }
   if(options.phrasesFile){
