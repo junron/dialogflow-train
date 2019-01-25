@@ -1,6 +1,6 @@
 {
   "name": "dialogflow-train",
-  "version": "2.5.4",
+  "version": "2.5.5",
   "description": "Utilities for training your dialogflow bot",
   "main": "index.js",
   "scripts": {
