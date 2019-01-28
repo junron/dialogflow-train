@@ -27,7 +27,7 @@
   "dependencies": {
     "commander": "^2.19.0",
     "csvtojson": "^2.0.8",
-    "dialogflow": "^0.7.0",
+    "dialogflow": "^0.8.0",
     "diff": "^4.0.1",
     "node-watch": "^0.6.0",
     "uuid": "^3.3.2"
