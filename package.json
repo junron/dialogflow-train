@@ -29,7 +29,7 @@
     "csvtojson": "^2.0.10",
     "dialogflow": "^1.2.0",
     "diff": "^4.0.2",
-    "node-watch": "^0.6.4",
+    "node-watch": "^0.7.0",
     "uuid": "^8.0.0"
   }
 }
