@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/junron/dialogflow-train#readme",
   "dependencies": {
-    "commander": "^5.1.0",
+    "commander": "^9.0.0",
     "csvtojson": "^2.0.10",
     "dialogflow": "^1.2.0",
     "diff": "^4.0.2",
